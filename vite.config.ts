@@ -1,10 +1,16 @@
-import { defineConfig } from 'vite'
-import type { UserConfig } from 'vite'
-import AutoImport from 'unplugin-auto-import/vite'
-import react from '@vitejs/plugin-react'
 import replace from '@rollup/plugin-replace'
+import react from '@vitejs/plugin-react'
+import AutoImport from 'unplugin-auto-import/vite'
+import { defineConfig } from 'vite'
+
+import {
+  isDev,
+  port,
+  r,
+} from './scripts/utils'
 import { MV3Hmr } from './vite-mv-hmr'
-import { isDev, port, r } from './scripts/utils'
+
+import type { UserConfig } from 'vite'
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
@@ -21,13 +27,12 @@ export const sharedConfig: UserConfig = {
     AutoImport({
       imports: [
         {
-          'webextension-polyfill': [['default', 'browser']],
+          'webextension-polyfill': [['=', 'browser']],
         },
       ],
       dts: r('src/auto-imports.d.ts'),
     }),
 
-    // @ts-expect-error -- rollup conflict with tsup rollup
     replace({
       preventAssignment: true,
       values: {

@@ -30,7 +30,7 @@ export async function getManifest() {
     },
     background: process.env.IS_FIREFOX_WEBEXT
       ? {
-          scripts: ['./dist/background/index.mjs'],
+          scripts: ['./dist/background/index.js'],
         }
       : {
           service_worker: './dist/background/index.mjs',
@@ -41,7 +41,7 @@ export async function getManifest() {
       128: './assets/icon-512.png',
     },
     optional_permissions: ['trialML'],
-    permissions: ['tabs', 'storage', 'activeTab'],
+    permissions: ['menus', 'tabs', 'storage', 'activeTab', 'scripting'],
     host_permissions: ['*://*/*'],
     content_scripts: [
       {

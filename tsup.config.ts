@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup'
+
 import { isDev } from './scripts/utils'
 
 export default defineConfig(() => ({
@@ -9,7 +10,7 @@ export default defineConfig(() => ({
   outDir: 'extension/dist',
   // bundle all imported packages into bundle(background.ts)
   noExternal: [/./],
-  format: ['esm'],
+  format: ['cjs'],
   target: 'esnext',
   ignoreWatch: ['**/extension/**'],
   splitting: false,
@@ -19,6 +20,6 @@ export default defineConfig(() => ({
     'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
   },
   platform: 'browser',
-  minifyWhitespace: !isDev,
-  minifySyntax: !isDev,
+  minifyWhitespace: false,
+  minifySyntax: false,
 }))
