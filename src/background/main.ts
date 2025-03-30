@@ -1,5 +1,7 @@
 // import { onMessage, sendMessage } from 'webext-bridge'
 
+import { sendMessage } from 'webext-bridge/background'
+
 import type { Tabs } from 'webextension-polyfill'
 
 browser.runtime.onInstalled.addListener((): void => {
@@ -63,6 +65,8 @@ async function generateAltText(targetElementId: number) {
   const res = await browser.trial.ml.runEngine({
     args: [imageUrl],
   })
+  const item = res[0]
+  self.__THEBROWSERRUNTIMEAI__.success(item.generated_text)
   console.log(res)
 
   // getModal is defined in content-script.js
@@ -95,6 +99,7 @@ async function handleGenerateAltText(info, tab?: Tabs.Tab) {
 
   const listener = (progressData) => {
     console.log('progressData', progressData)
+    sendMessage('progress', progressData, { context: 'content-script', tabId })
     // browser.tabs.sendMessage(tabId, progressData)
   }
 

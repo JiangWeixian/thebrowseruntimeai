@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { createRoot } from 'react-dom/client'
-import { onMessage } from 'webext-bridge'
+import { onMessage } from 'webext-bridge/content-script'
 
 import { App } from './views/App'
 
@@ -8,17 +8,18 @@ import { App } from './views/App'
 ;
 
 (() => {
-  console.info('[webext-template] Hello world from content script')
+  console.info('[thebrowserruntimeai] Hello world from content script')
 
   // communication example: send previous tab title from background page
   onMessage('tab-prev', ({ data }) => {
-    console.log(`[webext-template] Navigate from page "${data.title}"`)
+    console.log(`[thebrowserruntimeai] Navigate from page "${data.title}"`)
   })
 
   // mount component to context window
   const container = document.createElement('div')
   const root = document.createElement('div')
-  container.className = 'webext-template'
+  container.className = 'thebrowserruntimeai'
+  container.id = 'thebrowserruntimeai'
   const styleEl = document.createElement('link')
   const shadowDOM = container.attachShadow?.({ mode: __DEV__ ? 'open' : 'closed' }) || container
   styleEl.setAttribute('rel', 'stylesheet')
