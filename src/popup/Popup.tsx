@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
 import './style.css'
+
+import { useState } from 'react'
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,21 +8,21 @@ import './style.css'
 /* globals browser */
 
 function deleteCachedModels() {
-  browser.trial.ml.deleteCachedModels().then(_res => {
-    alert("Files deleted");
-  });
+  browser.trial.ml.deleteCachedModels().then((_res) => {
+    alert('Files deleted')
+  })
 }
 
 async function askPermission() {
-  await browser.permissions.request({ permissions: ["trialML"] });
-  await updateGranted();
+  await browser.permissions.request({ permissions: ['trialML'] })
+  await updateGranted()
 }
 
 async function updateGranted() {
-  let granted = await browser.permissions.contains({
-    permissions: ["trialML"],
-  });
-  document.body.classList.toggle("granted", granted);
+  const granted = await browser.permissions.contains({
+    permissions: ['trialML'],
+  })
+  document.body.classList.toggle('granted', granted)
 }
 
 export function Popup() {

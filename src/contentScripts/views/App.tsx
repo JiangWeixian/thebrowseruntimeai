@@ -1,10 +1,9 @@
-import React from 'react'
 import './style.css'
 
 export const App = () => {
   return (
-    <div className="fixed right-10 bottom-0 m-5 z-100 flex font-sans select-none leading-1em">
-      <div className="absolute r-0 bottom-0 flex w-10 h-10 rounded-full shadow cursor-pointer bg-teal-600" />
+    <div className="z-100 leading-1em fixed bottom-0 right-10 m-5 flex select-none font-sans">
+      <div className="r-0 absolute bottom-0 flex size-10 cursor-pointer rounded-full bg-teal-600 shadow" />
     </div>
   )
 }

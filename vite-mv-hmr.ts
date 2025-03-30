@@ -1,7 +1,10 @@
-import { dirname, join } from 'path'
-import type { HMRPayload, PluginOption } from 'vite'
+import { dirname, join } from 'node:path'
+
 import fs from 'fs-extra'
+
 import { isWin, r } from './scripts/utils'
+
+import type { HMRPayload, PluginOption } from 'vite'
 
 const targetDir = r('extension')
 
@@ -17,13 +20,17 @@ export const MV3Hmr = (): PluginOption => {
         if (payload.type === 'update') {
           for (const update of payload.updates) {
             await writeToDisk(update.path)
-            if (update.acceptedPath !== update.path) await writeToDisk(update.acceptedPath)
+            if (update.acceptedPath !== update.path) {
+              await writeToDisk(update.acceptedPath)
+            }
           }
 
           payload.updates = payload.updates.map((update) => {
             const isJsUpdate = update.type === 'js-update'
 
-            if (!isJsUpdate) return update
+            if (!isJsUpdate) {
+              return update
+            }
 
             return {
               ...update,
@@ -38,7 +45,9 @@ export const MV3Hmr = (): PluginOption => {
       async function writeToDisk(url: string) {
         const result = await server.transformRequest(url.replace(/^\/@id\//, ''))
         let code = result?.code
-        if (!code) return
+        if (!code) {
+          return
+        }
 
         const urlModule = await server.moduleGraph.getModuleByUrl(url)
         const importedModules = urlModule?.importedModules
@@ -79,7 +88,7 @@ export const MV3Hmr = (): PluginOption => {
         }
       }
 
-      Object.keys(server.config.build.rollupOptions.input!).map((entry) =>
+      Object.keys(server.config.build.rollupOptions.input!).map(entry =>
         writeToDisk(`/${entry}/main.ts`),
       )
     },
@@ -89,8 +98,9 @@ export const MV3Hmr = (): PluginOption => {
 function normalizeViteUrl(url: string, type: string) {
   url = url.replace(/\?v=\w+$/, '')
 
-  if (type === 'js' && !url.endsWith('.js') && !url.endsWith('.mjs'))
+  if (type === 'js' && !url.endsWith('.js') && !url.endsWith('.mjs')) {
     url = `${url}.js`.replace(/vue\?/, 'vue.js_')
+  }
 
   return url
 }
@@ -102,8 +112,8 @@ function normalizeFsUrl(url: string, type: string) {
       .replace(/^\//, '')
       // `\0plugin-vue:export-helper` EXPORT_HELPER_ID
       // eslint-disable-next-line no-control-regex
-      .replace(/\u0000/g, '__x00__')
+      .replace(/\0/g, '__x00__')
       // filenames starting with "_" are reserved for use by the system.
-      .replace(/^_+/, (match) => '~'.repeat(match.length)),
+      .replace(/^_+/, match => '~'.repeat(match.length)),
   )
 }
