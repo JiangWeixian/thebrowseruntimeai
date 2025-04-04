@@ -1,4 +1,7 @@
 {
   "eslint.useFlatConfig": true,
-  "cSpell.words": ["THEBROWSERRUNTIMEAI"]
+  "cSpell.words": [
+    "sonner",
+    "THEBROWSERRUNTIMEAI"
+  ]
 }

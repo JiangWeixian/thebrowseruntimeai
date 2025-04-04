@@ -4,7 +4,7 @@ import 'sonner/dist/styles.css'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { DownloadProgress } from '~/components/dowload-progress'
+import { DownloadProgress } from '~/components/download-progress'
 import { Button } from '~/components/ui/button'
 import { Toaster } from '~/components/ui/sonner'
 import { useBearStore } from '~/hooks/use-store'
@@ -64,26 +64,6 @@ export const App = () => {
       }
       return true
     })
-    // onMessage('progress', (data) => {
-    //   const progress = data.data as unknown as ProgressData
-    //   if (progress.type !== 'initializing') {
-    //     updateProgress(progress.metadata.file, progress)
-    //   }
-    //   if (!toastId) {
-    //     toastId = toast(
-    //       () => {
-    //         return 'Downloading...'
-    //       },
-    //       {
-    //         description: () => {
-    //           return <DownloadProgress />
-    //         },
-    //         duration: Infinity,
-    //       },
-    //     )
-    //   }
-    //   // console.log('progress', data, progressStore)
-    // })
   }, [updateProgress])
   return (
     <div id="thebrowserruntimeai-container" className="z-100 leading-1em fixed bottom-0 right-10 m-5 flex select-none font-sans">
