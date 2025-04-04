@@ -1,8 +1,5 @@
-// import { onMessage, sendMessage } from 'webext-bridge'
-
-import { sendMessage } from 'webext-bridge/background'
-
-import type { Tabs } from 'webextension-polyfill'
+import type { Menus, Tabs } from 'webextension-polyfill'
+import type { TrialMl } from 'webextension-polyfill/namespaces/trial_ml'
 
 browser.runtime.onInstalled.addListener((): void => {
   // eslint-disable-next-line no-console
@@ -61,46 +58,30 @@ function setFirstRun(tabId: number, isFirstRun: boolean) {
  * Called in the tab content
  */
 async function generateAltText(targetElementId: number) {
-  const imageUrl = browser.menus.getTargetElement(targetElementId).src
-  const res = await browser.trial.ml.runEngine({
+  const imageUrl = (browser.menus.getTargetElement(targetElementId) as HTMLImageElement).src
+  self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
+  const res: any = await browser.trial.ml.runEngine({
     args: [imageUrl],
   })
   const item = res[0]
   self.__THEBROWSERRUNTIMEAI__.success(item.generated_text)
   console.log(res)
+}
 
-  // getModal is defined in content-script.js
-  // const modal = getModal()
-  // try {
-  //   const imageUrl = browser.menus.getTargetElement(targetElementId).src
-  //   modal.updateText('Running inference...')
-
-  //   const res = await browser.trial.ml.runEngine({
-  //     args: [imageUrl],
-  //   })
-  //   modal.updateText(res[0].generated_text)
-  // } catch (err) {
-  //   modal.updateText(`${err}`)
-  // }
+async function testToast() {
+  self.__THEBROWSERRUNTIMEAI__.test()
 }
 
 // image-to-text handler
-async function handleGenerateAltText(info, tab?: Tabs.Tab) {
-  const tabId = tab.id
+async function handleGenerateAltText(info: Menus.OnClickData, tab?: Tabs.Tab) {
+  const tabId = tab?.id
   if (!tabId) {
     return
   }
 
-  // if (isFirstRun(tabId)) {
-  //   browser.tabs.insertCSS(tabId, {
-  //     file: './alt-text-modal.css',
-  //   })
-  // }
-
-  const listener = (progressData) => {
+  const listener = (progressData: TrialMl.OnProgressProgressDataType) => {
+    browser.tabs.sendMessage(tabId, progressData)
     console.log('progressData', progressData)
-    sendMessage('progress', progressData, { context: 'content-script', tabId })
-    // browser.tabs.sendMessage(tabId, progressData)
   }
 
   browser.trial.ml.onProgress.addListener(listener)
@@ -112,13 +93,8 @@ async function handleGenerateAltText(info, tab?: Tabs.Tab) {
       //   files: ['./content-script.js'],
       // })
 
-      // running generateAltText
-      // await browser.scripting.executeScript({
-      //   target: {
-      //     tabId: tab.id,
-      //   },
-      //   func: initModal,
-      // })
+      // initializing toast
+      browser.tabs.sendMessage(tabId, { type: 'initializing' })
 
       await browser.trial.ml.createEngine({
         modelHub: 'mozilla',
@@ -140,26 +116,30 @@ async function handleGenerateAltText(info, tab?: Tabs.Tab) {
 }
 
 browser.menus.create({
-  id: 'generate-alt-text',
-  title: 'Generate Alt Text',
+  id: 'image-to-text',
+  title: 'Image to Text',
   documentUrlPatterns: ['*://*/*'],
   contexts: ['image'],
 })
 
-browser.menus.onClicked.addListener((info, tab) => {
-  console.log('test', info, tab)
-  handleGenerateAltText(info, tab)
+browser.menus.create({
+  id: 'test-toast',
+  title: 'test-toast',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['image'],
 })
 
-// onMessage('get-current-tab', async () => {
-//   try {
-//     const tab = await browser.tabs.get(previousTabId)
-//     return {
-//       title: tab?.id,
-//     }
-//   } catch {
-//     return {
-//       title: undefined,
-//     }
-//   }
-// })
+browser.menus.onClicked.addListener(async (info, tab) => {
+  console.log('test', info, tab)
+  if (info.menuItemId === 'image-to-text') {
+    await handleGenerateAltText(info, tab)
+  }
+  if (info.menuItemId === 'test-toast' && tab?.id) {
+    await browser.scripting.executeScript({
+      target: {
+        tabId: tab?.id,
+      },
+      func: testToast,
+    })
+  }
+})

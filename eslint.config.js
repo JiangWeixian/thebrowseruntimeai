@@ -6,7 +6,7 @@ module.exports = aiou(
   },
   [
     {
-      ignores: ['**/auto-imports.d.ts', 'scripts/**'],
+      ignores: ['**/auto-imports.d.ts', 'scripts/**', 'extension/**'],
     },
     {
       rules: {

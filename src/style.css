@@ -66,3 +66,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom toast styles */
+[data-sonner-toaster] [data-sonner-toast] {
+  height: auto !important;
+  min-height: 3.5rem;
+  transition: none !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled="true"] {
+  transform: none !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast]:hover {
+  transform: none !important;
+}

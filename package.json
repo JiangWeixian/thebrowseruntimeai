@@ -42,7 +42,7 @@
     "pack:crx": "crx pack extension -o ./extension.crx",
     "pack:xpi": "cross-env WEB_EXT_ARTIFACTS_DIR=./ web-ext build --source-dir ./extension --filename extension.xpi --overwrite-dest",
     "start:chromium": "web-ext run --source-dir ./extension --target=chromium",
-    "prepare:firefox": "npm run clear && cross-env IS_FIREFOX_WEBEXT=1 NODE_ENV=development run-p dev:*",
+    "prepare:firefox": "npm run clear && cross-env IS_FIREFOX_WEBEXT=1 NODE_ENV=development pnpm run build",
     "start:firefox": "IS_FIREFOX_WEBEXT=1 web-ext run --source-dir ./extension --target=firefox-desktop",
     "start:firefox-nightly": "IS_FIREFOX_WEBEXT=1 web-ext run --source-dir ./extension --firefox=nightly",
     "clear": "rimraf extension",
@@ -55,6 +55,8 @@
     "**/**/*.{js,ts,tsx,vue,json}": ["eslint --fix"]
   },
   "dependencies": {
+    "@radix-ui/react-progress": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "document-ready": "^2.0.2",
@@ -64,7 +66,8 @@
     "react-dom": "^18.2.0",
     "sonner": "^2.0.2",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@aiou/eslint-config": "^1.5.1",
