@@ -72,7 +72,7 @@ async function generateAltText(targetElementId: number) {
   })
   const item = res[0]
   self.__THEBROWSERRUNTIMEAI__.success(item.generated_text)
-  console.log(res)
+  console.debug(res)
 }
 
 /**
@@ -85,7 +85,7 @@ async function summaryText(text: string) {
   })
   const item = res[0]
   self.__THEBROWSERRUNTIMEAI__.success(item.summary_text)
-  console.log(res)
+  console.debug(res)
 }
 
 async function testToast() {
@@ -210,9 +210,8 @@ const handleSummarization = createTaskHandler('summarization', async (info, tab)
       },
     })
     selectedText = await browser.tabs.sendMessage(tabId!, { type: 'get-readable-text' })
-    console.log('html', selectedText)
   }
-  console.log('selectedText', selectedText)
+  console.debug('selectedText', selectedText)
   if (!selectedText) {
     return
   }
@@ -240,5 +239,12 @@ browser.menus.onClicked.addListener(async (info, tab) => {
       },
       func: testToast,
     })
+  }
+})
+
+// request permission if not granted
+browser.permissions.contains({ permissions: ['trialML'] }).then((granted) => {
+  if (!granted) {
+    browser.tabs.create({ url: browser.runtime.getURL('./dist/options/index.html') })
   }
 })
