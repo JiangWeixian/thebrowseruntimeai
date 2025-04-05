@@ -66,7 +66,7 @@ export const App = () => {
         }
       }
       if (data.type === 'initializing') {
-        toast('Initializing...')
+        toast('Initializing...', { duration: Infinity })
       }
       if (data.type === 'notification') {
         const { message, level } = data.payload

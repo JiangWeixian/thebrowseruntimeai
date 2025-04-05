@@ -30,7 +30,7 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
   // sendMessage('tab-prev', { title: tab.title }, { context: 'content-script', tabId })
 })
 
-type TaskName = 'image-to-text' | 'summarization'
+type TaskName = 'image-to-text' | 'summarization' | 'translation'
 // Initialize the Map to track first run status per tab
 const firstRunOnTab = new Map<number, Record<string, boolean | undefined>>()
 
@@ -72,12 +72,9 @@ async function generateAltText(targetElementId: number) {
   })
   const item = res[0]
   self.__THEBROWSERRUNTIMEAI__.success(item.generated_text)
-  console.debug(res)
+  console.debug('image-to-text', res)
 }
 
-/**
- * Called in the tab content
- */
 async function summaryText(text: string) {
   self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
   const res: any = await browser.trial.ml.runEngine({
@@ -85,7 +82,22 @@ async function summaryText(text: string) {
   })
   const item = res[0]
   self.__THEBROWSERRUNTIMEAI__.success(item.summary_text)
-  console.debug(res)
+  console.debug('summaryText', res)
+}
+
+async function translate(text: string, tgt_lang: string = 'zh') {
+  self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
+  const res: any = await browser.trial.ml.runEngine({
+    args: [
+      text,
+      {
+        tgt_lang,
+      },
+    ],
+  })
+  console.log('translate', res)
+  const item = res[0]
+  self.__THEBROWSERRUNTIMEAI__.success(item.translation_text)
 }
 
 async function testToast() {
@@ -135,6 +147,18 @@ async function testToast() {
 //   }
 // }
 
+const config: Record<TaskName, {
+  modelHub?: 'huggingface' | 'mozilla'
+  modelId?: string
+}> = {
+  'image-to-text': {},
+  summarization: {},
+  translation: {
+    modelHub: 'huggingface',
+    modelId: 'Xenova/m2m100_418M',
+  },
+}
+
 // refs: https://firefox-source-docs.mozilla.org/toolkit/components/ml/extensions.html#webextensions-ai-api
 const createTaskHandler = (taskName: TaskName, handler: (info: Menus.OnClickData, tab?: Tabs.Tab) => Promise<any>) => {
   return async (info: Menus.OnClickData, tab?: Tabs.Tab) => {
@@ -145,7 +169,7 @@ const createTaskHandler = (taskName: TaskName, handler: (info: Menus.OnClickData
 
     const listener = (progressData: TrialMl.OnProgressProgressDataType) => {
       browser.tabs.sendMessage(tabId, { type: 'progress', payload: progressData })
-      // console.log('progressData', progressData)
+      console.log('progressData', progressData)
     }
 
     browser.trial.ml.onProgress.addListener(listener)
@@ -156,9 +180,9 @@ const createTaskHandler = (taskName: TaskName, handler: (info: Menus.OnClickData
 
         await browser.trial.ml.createEngine({
           taskName,
+          ...config[taskName],
         })
       }
-      // running generateAltText
       await handler(info, tab)
     } finally {
       browser.trial.ml.onProgress.removeListener(listener)
@@ -179,6 +203,20 @@ browser.menus.create({
   title: 'Summarization',
   documentUrlPatterns: ['*://*/*'],
   contexts: ['page', 'selection'],
+})
+
+browser.menus.create({
+  id: 'translation-to-zh',
+  title: 'Translate to Chinese',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['selection'],
+})
+
+browser.menus.create({
+  id: 'translation-to-en',
+  title: 'Translate to English',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['selection'],
 })
 
 browser.menus.create({
@@ -224,6 +262,21 @@ const handleSummarization = createTaskHandler('summarization', async (info, tab)
   })
 })
 
+const handleTranslate = createTaskHandler('translation', async (info, tab) => {
+  const selectedText = info.selectionText
+  const tabId = tab?.id
+  if (!selectedText) {
+    return
+  }
+  return await browser.scripting.executeScript({
+    target: {
+      tabId: tabId!,
+    },
+    func: translate,
+    args: [selectedText, info.menuItemId === 'translation-to-zh' ? 'zh' : 'en'],
+  })
+})
+
 browser.menus.onClicked.addListener(async (info, tab) => {
   console.log('test', info, tab)
   if (info.menuItemId === 'image-to-text') {
@@ -231,6 +284,9 @@ browser.menus.onClicked.addListener(async (info, tab) => {
   }
   if (info.menuItemId === 'summarization') {
     await handleSummarization(info, tab)
+  }
+  if (info.menuItemId === 'translation-to-zh' || info.menuItemId === 'translation-to-en') {
+    await handleTranslate(info, tab)
   }
   if (info.menuItemId === 'test-toast' && tab?.id) {
     await browser.scripting.executeScript({
