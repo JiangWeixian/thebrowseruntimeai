@@ -7,7 +7,7 @@ import { useBearStore } from '~/hooks/use-store'
 export const DownloadProgress = () => {
   const { progress } = useBearStore()
   return (
-    <div className="flex h-fit flex-col gap-2">
+    <div className="flex h-fit w-full flex-col gap-2">
       {
         Object.keys(progress).map((key) => {
           const { metadata, progress: value } = progress[key]
@@ -19,8 +19,8 @@ export const DownloadProgress = () => {
           )
         })
       }
-      <div className="flex w-full justify-end">
-        <Button size="sm" variant="outline" onClick={() => toast.dismiss()}>Close</Button>
+      <div className="mt-2 flex w-full justify-end">
+        <Button size="sm" variant="outline" onClick={() => toast.dismiss()}>Dismiss all</Button>
       </div>
     </div>
   )

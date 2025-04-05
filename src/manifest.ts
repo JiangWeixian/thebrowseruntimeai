@@ -30,7 +30,8 @@ export async function getManifest() {
     },
     background: process.env.IS_FIREFOX_WEBEXT
       ? {
-          scripts: ['./dist/background/index.js'],
+          scripts: ['./dist/background/index.mjs'],
+          type: 'module',
         }
       : {
           service_worker: './dist/background/index.mjs',

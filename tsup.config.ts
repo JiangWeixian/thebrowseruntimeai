@@ -10,7 +10,7 @@ export default defineConfig(() => ({
   outDir: 'extension/dist',
   // bundle all imported packages into bundle(background.ts)
   noExternal: [/./],
-  format: ['cjs'],
+  format: ['esm'],
   target: 'esnext',
   ignoreWatch: ['**/extension/**'],
   splitting: false,

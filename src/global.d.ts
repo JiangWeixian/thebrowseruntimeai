@@ -6,3 +6,5 @@ interface Window {
     test: () => void
   }
 }
+
+declare module 'turndown-plugin-gfm'

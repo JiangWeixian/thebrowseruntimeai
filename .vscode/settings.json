@@ -2,6 +2,7 @@
   "eslint.useFlatConfig": true,
   "cSpell.words": [
     "sonner",
-    "THEBROWSERRUNTIMEAI"
+    "THEBROWSERRUNTIMEAI",
+    "webextension"
   ]
 }

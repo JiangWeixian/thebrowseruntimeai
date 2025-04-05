@@ -8,14 +8,16 @@ import { DownloadProgress } from '~/components/download-progress'
 import { Button } from '~/components/ui/button'
 import { Toaster } from '~/components/ui/sonner'
 import { useBearStore } from '~/hooks/use-store'
+import { readableText } from '~/logic/html'
 
-import type { ProgressData } from '~/logic/types'
+import type { Message } from '~/logic/types'
 
 let toastId: number | string | undefined
 
 self.__THEBROWSERRUNTIMEAI__ = {
   success: (message: string) => {
-    toast.success(message)
+    toast.dismiss(toastId)
+    toast.success(message, { duration: Infinity, action: { label: 'Dismiss all', onClick: () => toast.dismiss() } })
   },
   test: () => {
     const toastId = toast(
@@ -44,23 +46,36 @@ export const App = () => {
     document.head.appendChild(styleEl)
   }, [])
   useEffect(() => {
-    browser.runtime.onMessage.addListener((_data, _sender, _sendResponse) => {
-      const data = _data as unknown as ProgressData
-      if (data.type !== 'initializing') {
-        updateProgress(data.metadata.file, data)
-      }
-      if (!toastId) {
-        toastId = toast(
-          () => {
-            return 'Downloading...'
-          },
-          {
-            description: () => {
-              return <DownloadProgress />
+    browser.runtime.onMessage.addListener((_data, _sender, sendResponse) => {
+      const data = _data as unknown as Message
+      if (data.type === 'progress') {
+        const alreadyLoaded = typeof data.payload.progress !== 'number'
+        updateProgress(data.payload.metadata.file, data.payload)
+        if (!toastId && !alreadyLoaded) {
+          toastId = toast(
+            () => {
+              return 'Downloading...'
             },
-            duration: Infinity,
-          },
-        )
+            {
+              description: () => {
+                return <DownloadProgress />
+              },
+              duration: Infinity,
+            },
+          )
+        }
+      }
+      if (data.type === 'initializing') {
+        toast('Initializing...')
+      }
+      if (data.type === 'notification') {
+        const { message, level } = data.payload
+        const fn = toast[level]
+        fn(message)
+      }
+      if (data.type === 'get-readable-text') {
+        const text = readableText(document.cloneNode(true) as Document)
+        sendResponse(text)
       }
       return true
     })
