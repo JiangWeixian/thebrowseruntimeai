@@ -27,6 +27,10 @@ import { App } from './views/App'
   shadowDOM.appendChild(styleEl)
   shadowDOM.appendChild(root)
   document.body.appendChild(container)
-  const $root = createRoot(root)
+  const $root = createRoot(root, {
+    onRecoverableError: (error) => {
+      console.error('[thebrowserruntimeai] Error', error)
+    },
+  })
   $root.render(<App />)
 })()

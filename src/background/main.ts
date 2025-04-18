@@ -27,10 +27,9 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
 
   // eslint-disable-next-line no-console
   console.log('previous tab', tab)
-  // sendMessage('tab-prev', { title: tab.title }, { context: 'content-script', tabId })
 })
 
-type TaskName = 'image-to-text' | 'summarization' | 'translation'
+type TaskName = 'image-classification' | 'image-to-text' | 'summarization' | 'text-classification' | 'text-generation' | 'translation'
 // Initialize the Map to track first run status per tab
 const firstRunOnTab = new Map<number, Record<string, boolean | undefined>>()
 
@@ -42,6 +41,7 @@ const firstRunOnTab = new Map<number, Record<string, boolean | undefined>>()
  * @returns {boolean} - True if this is the first run on this tab, false otherwise.
  */
 function isFirstRun(tabId?: number, taskName?: TaskName) {
+  console.log('isFirstRun', tabId, taskName, firstRunOnTab)
   if (!tabId) {
     return true
   }
@@ -65,6 +65,7 @@ function setFirstRun(tabId: number, taskName: TaskName, isFirstRun: boolean) {
  * Called in the tab content
  */
 async function generateAltText(targetElementId: number) {
+  self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
   const imageUrl = (browser.menus.getTargetElement(targetElementId) as HTMLImageElement).src
   self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
   const res: any = await browser.trial.ml.runEngine({
@@ -100,52 +101,40 @@ async function translate(text: string, tgt_lang: string = 'zh') {
   self.__THEBROWSERRUNTIMEAI__.success(item.translation_text)
 }
 
-async function testToast() {
-  self.__THEBROWSERRUNTIMEAI__.test()
+async function textClassification(text: string) {
+  self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
+  const res: any = await browser.trial.ml.runEngine({
+    args: [
+      text,
+    ],
+  })
+  console.log('text-classification', res)
+  const item = res[0]
+  self.__THEBROWSERRUNTIMEAI__.success(JSON.stringify(item))
 }
 
-// image-to-text handler
-// async function handleGenerateAltText(info: Menus.OnClickData, tab?: Tabs.Tab) {
-//   const tabId = tab?.id
-//   if (!tabId) {
-//     return
-//   }
+async function textGeneration(text: string) {
+  self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
+  const res: any = await browser.trial.ml.runEngine({
+    args: [
+      text,
+    ],
+  })
+  console.log('text-generation', res)
+  const item = res[0]
+  self.__THEBROWSERRUNTIMEAI__.success(item.generated_text)
+}
 
-//   const listener = (progressData: TrialMl.OnProgressProgressDataType) => {
-//     browser.tabs.sendMessage(tabId, progressData)
-//     console.log('progressData', progressData)
-//   }
-
-//   browser.trial.ml.onProgress.addListener(listener)
-//   try {
-//     if (isFirstRun(tabId)) {
-//       // injecting content-script.js, which creates the AltTextModal instance.
-//       // await browser.scripting.executeScript({
-//       //   target: { tabId },
-//       //   files: ['./content-script.js'],
-//       // })
-
-//       // initializing toast
-//       browser.tabs.sendMessage(tabId, { type: 'initializing' })
-
-//       await browser.trial.ml.createEngine({
-//         modelHub: 'mozilla',
-//         taskName: 'image-to-text',
-//       })
-//     }
-//     // running generateAltText
-//     await browser.scripting.executeScript({
-//       target: {
-//         tabId,
-//       },
-//       func: generateAltText,
-//       args: [info.targetElementId],
-//     })
-//   } finally {
-//     browser.trial.ml.onProgress.removeListener(listener)
-//     setFirstRun(tabId, false)
-//   }
-// }
+async function imageClassification(targetElementId: number) {
+  const imageUrl = (browser.menus.getTargetElement(targetElementId) as HTMLImageElement).src
+  self.__THEBROWSERRUNTIMEAI__.success('Thinking...')
+  const res: any = await browser.trial.ml.runEngine({
+    args: [imageUrl],
+  })
+  const item = res[0]
+  self.__THEBROWSERRUNTIMEAI__.success(JSON.stringify(item))
+  console.debug('image-classification', res)
+}
 
 const config: Record<TaskName, {
   modelHub?: 'huggingface' | 'mozilla'
@@ -156,6 +145,18 @@ const config: Record<TaskName, {
   translation: {
     modelHub: 'huggingface',
     modelId: 'Xenova/m2m100_418M',
+  },
+  'text-classification': {
+    modelHub: 'huggingface',
+    modelId: 'Xenova/distilbert-base-uncased-finetuned-sst-2-english',
+  },
+  'text-generation': {
+    modelHub: 'huggingface',
+    modelId: 'Xenova/distilgpt2',
+  },
+  'image-classification': {
+    modelHub: 'huggingface',
+    modelId: 'Xenova/vit-base-patch16-224',
   },
 }
 
@@ -259,13 +260,6 @@ browser.menus.create({
   contexts: ['selection'],
 })
 
-browser.menus.create({
-  id: 'test-toast',
-  title: 'test-toast',
-  documentUrlPatterns: ['*://*/*'],
-  contexts: ['image'],
-})
-
 const handleTranslate = createTaskHandler('translation', async (info, tab) => {
   const selectedText = info.selectionText
   const tabId = tab?.id
@@ -281,23 +275,116 @@ const handleTranslate = createTaskHandler('translation', async (info, tab) => {
   })
 })
 
+browser.menus.create({
+  id: 'text-classification',
+  title: 'Text Classification',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['selection'],
+})
+
+const handleTextClassification = createTaskHandler('text-classification', async (info, tab) => {
+  const selectedText = info.selectionText
+  const tabId = tab?.id
+  if (!selectedText) {
+    return
+  }
+  return await browser.scripting.executeScript({
+    target: {
+      tabId: tabId!,
+    },
+    func: textClassification,
+    args: [selectedText],
+  })
+})
+
+browser.menus.create({
+  id: 'text-generation',
+  title: 'Text Generation',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['selection'],
+})
+
+const handleTextGeneration = createTaskHandler('text-generation', async (info, tab) => {
+  const selectedText = info.selectionText
+  const tabId = tab?.id
+  if (!selectedText) {
+    return
+  }
+  return await browser.scripting.executeScript({
+    target: {
+      tabId: tabId!,
+    },
+    func: textGeneration,
+    args: [selectedText],
+  })
+})
+
+browser.menus.create({
+  id: 'image-classification',
+  title: 'Image Classification',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['image'],
+})
+
+const handleImageClassification = createTaskHandler('image-classification', async (info, tab) => {
+  const tabId = tab?.id
+  return await browser.scripting.executeScript({
+    target: {
+      tabId: tabId!,
+    },
+    func: imageClassification,
+    args: [info.targetElementId],
+  })
+})
+
+// browser.menus.create({
+//   id: 'test-toast',
+//   title: 'test-toast',
+//   documentUrlPatterns: ['*://*/*'],
+//   contexts: ['image'],
+// })
+
+// async function testToast() {
+//   self.__THEBROWSERRUNTIMEAI__.test()
+// }
+
 browser.menus.onClicked.addListener(async (info, tab) => {
   console.log('test', info, tab)
-  if (info.menuItemId === 'image-to-text') {
-    await handleGenerateAltText(info, tab)
-  }
-  if (info.menuItemId === 'summarization') {
-    await handleSummarization(info, tab)
-  }
-  if (info.menuItemId === 'translation-to-zh' || info.menuItemId === 'translation-to-en') {
-    await handleTranslate(info, tab)
-  }
-  if (info.menuItemId === 'test-toast' && tab?.id) {
-    await browser.scripting.executeScript({
-      target: {
-        tabId: tab?.id,
+  try {
+    if (info.menuItemId === 'image-to-text') {
+      return await handleGenerateAltText(info, tab)
+    }
+    if (info.menuItemId === 'summarization') {
+      return await handleSummarization(info, tab)
+    }
+    if (info.menuItemId === 'translation-to-zh' || info.menuItemId === 'translation-to-en') {
+      return await handleTranslate(info, tab)
+    }
+    if (info.menuItemId === 'text-classification') {
+      return await handleTextClassification(info, tab)
+    }
+    if (info.menuItemId === 'text-generation') {
+      return await handleTextGeneration(info, tab)
+    }
+    if (info.menuItemId === 'image-classification') {
+      return await handleImageClassification(info, tab)
+    }
+    // if (info.menuItemId === 'test-toast' && tab?.id) {
+    //   await browser.scripting.executeScript({
+    //     target: {
+    //       tabId: tab?.id,
+    //     },
+    //     func: testToast,
+    //   })
+    // }
+  } catch (error) {
+    console.error('error', error)
+    await browser.tabs.sendMessage(tab!.id!, {
+      type: 'notification',
+      payload: {
+        message: error instanceof Error ? error.message : JSON.stringify(error),
+        level: 'error',
       },
-      func: testToast,
     })
   }
 })

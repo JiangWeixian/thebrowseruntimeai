@@ -1,20 +1,25 @@
 # thebrowserruntimeai
 
+One-click experience of browser's built-in AI features
+
+> [!WARNING]  
+Firefox trail ml require extension running in singleton mode, Run different task on same page should reload extension first!(reload page is not working)
+
 ## Models and Browser Compatibility
 
 | Task | Model | Firefox | Chrome |
 |------|-------|---------|--------|
-| Text Classification | Xenova/distilbert-base-uncased-finetuned-sst-2-english | ❌ | ❌ |
+| Text Classification | Xenova/distilbert-base-uncased-finetuned-sst-2-english | ✅ | ❌ |
 | Token Classification | Xenova/bert-base-multilingual-cased-ner-hrl | ❌ | ❌ |
 | Question Answering | Xenova/distilbert-base-cased-distilled-squad | ❌ | ❌ |
 | Fill Mask | Xenova/bert-base-uncased | ❌ | ❌ |
 | Summarization | Xenova/distilbart-cnn-6-6 | ✅ | ❌ |
 | Translation | Xenova/t5-small | ✅ | ❌ |
 | Text2Text Generation | Xenova/flan-t5-small | ❌ | ❌ |
-| Text Generation | Xenova/gpt2 | ❌ | ❌ |
+| Text Generation | Xenova/distilgpt2 | ✅ | ❌ |
 | Zero-shot Classification | Xenova/distilbert-base-uncased-mnli | ❌ | ❌ |
 | Image to Text | Mozilla/distilvit | ✅ | ❌ |
-| Image Classification | Xenova/vit-base-patch16-224 | ❌ | ❌ |
+| Image Classification | Xenova/vit-base-patch16-224 | ✅ | ❌ |
 | Image Segmentation | Xenova/detr-resnet-50-panoptic | ❌ | ❌ |
 | Zero-shot Image Classification | Xenova/clip-vit-base-patch32 | ❌ | ❌ |
 | Object Detection | Xenova/detr-resnet-50 | ❌ | ❌ |

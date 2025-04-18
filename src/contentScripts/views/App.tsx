@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 import { DownloadProgress } from '~/components/download-progress'
+import { ErrorBoundary } from '~/components/error'
 import { Button } from '~/components/ui/button'
 import { Toaster } from '~/components/ui/sonner'
 import { useBearStore } from '~/hooks/use-store'
@@ -18,6 +19,10 @@ self.__THEBROWSERRUNTIMEAI__ = {
   success: (message: string) => {
     toast.dismiss(toastId)
     toast.success(message, { duration: Infinity, action: { label: 'Dismiss all', onClick: () => toast.dismiss() } })
+  },
+  error: (message: string) => {
+    toast.dismiss()
+    toast.error(message)
   },
   test: () => {
     const toastId = toast(
@@ -81,8 +86,10 @@ export const App = () => {
     })
   }, [updateProgress])
   return (
-    <div id="thebrowserruntimeai-container" className="z-100 leading-1em fixed bottom-0 right-10 m-5 flex select-none font-sans">
-      <Toaster />
-    </div>
+    <ErrorBoundary>
+      <div id="thebrowserruntimeai-container" className="z-100 leading-1em fixed bottom-0 right-10 m-5 flex select-none font-sans">
+        <Toaster />
+      </div>
+    </ErrorBoundary>
   )
 }
