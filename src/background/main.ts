@@ -191,37 +191,10 @@ const createTaskHandler = (taskName: TaskName, handler: (info: Menus.OnClickData
   }
 }
 
+// Image to Text
 browser.menus.create({
   id: 'image-to-text',
   title: 'Image to Text',
-  documentUrlPatterns: ['*://*/*'],
-  contexts: ['image'],
-})
-
-browser.menus.create({
-  id: 'summarization',
-  title: 'Summarization',
-  documentUrlPatterns: ['*://*/*'],
-  contexts: ['page', 'selection'],
-})
-
-browser.menus.create({
-  id: 'translation-to-zh',
-  title: 'Translate to Chinese',
-  documentUrlPatterns: ['*://*/*'],
-  contexts: ['selection'],
-})
-
-browser.menus.create({
-  id: 'translation-to-en',
-  title: 'Translate to English',
-  documentUrlPatterns: ['*://*/*'],
-  contexts: ['selection'],
-})
-
-browser.menus.create({
-  id: 'test-toast',
-  title: 'test-toast',
   documentUrlPatterns: ['*://*/*'],
   contexts: ['image'],
 })
@@ -234,6 +207,14 @@ const handleGenerateAltText = createTaskHandler('image-to-text', async (info, ta
     func: generateAltText,
     args: [info.targetElementId],
   })
+})
+
+// Summarization
+browser.menus.create({
+  id: 'summarization',
+  title: 'Summarization',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['page', 'selection'],
 })
 
 const handleSummarization = createTaskHandler('summarization', async (info, tab) => {
@@ -260,6 +241,29 @@ const handleSummarization = createTaskHandler('summarization', async (info, tab)
     func: summaryText,
     args: [selectedText],
   })
+})
+
+// Translation to Chinese
+browser.menus.create({
+  id: 'translation-to-zh',
+  title: 'Translate to Chinese',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['selection'],
+})
+
+// Translation to English
+browser.menus.create({
+  id: 'translation-to-en',
+  title: 'Translate to English',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['selection'],
+})
+
+browser.menus.create({
+  id: 'test-toast',
+  title: 'test-toast',
+  documentUrlPatterns: ['*://*/*'],
+  contexts: ['image'],
 })
 
 const handleTranslate = createTaskHandler('translation', async (info, tab) => {
