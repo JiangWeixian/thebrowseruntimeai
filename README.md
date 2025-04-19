@@ -12,7 +12,7 @@ https://github.com/user-attachments/assets/1ca850a6-260d-4dd0-a1e0-a91339d41367
 ### Firefox
 
 1. Install firefox nightly version
-2. Download extension from [release page](https://github.com/thebrowserruntime/thebrowserruntimeai/releases)
+2. Download extension from [release page](https://github.com/JiangWeixian/thebrowseruntimeai/releases)
 3. Open `about:debugging#/runtime/this-firefox` and load the extension (check [link](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/) for more details)
 
 ## Models and Browser Compatibility
