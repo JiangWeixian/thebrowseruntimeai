@@ -37,9 +37,9 @@ export async function getManifest() {
           service_worker: './dist/background/index.mjs',
         },
     icons: {
-      16: './assets/icon-512.png',
-      48: './assets/icon-512.png',
-      128: './assets/icon-512.png',
+      // 16: './assets/icon-512.png',
+      // 48: './assets/icon-512.png',
+      512: './assets/icon-512.png',
     },
     optional_permissions: ['trialML'],
     permissions: ['menus', 'tabs', 'storage', 'activeTab', 'scripting'],
@@ -61,6 +61,11 @@ export async function getManifest() {
         // this is required on dev for Vite script to load
         ? `script-src \'self\' http://localhost:${port}; object-src \'self\'`
         : 'script-src \'self\'; object-src \'self\'',
+    },
+    browser_specific_settings: {
+      gecko: {
+        id: 'thebrowserruntimeai@gmail.com',
+      },
     },
   }
 

@@ -5,9 +5,17 @@ One-click experience of browser's built-in AI features
 > [!WARNING]  
 Firefox trail ml require extension running in singleton mode, Run different task on same page should reload extension first!(reload page is not working)
 
+## Usage
+
+### Firefox
+
+1. Install firefox nightly version
+2. Download extension from [release page](https://github.com/thebrowserruntime/thebrowserruntimeai/releases)
+3. Open `about:debugging#/runtime/this-firefox` and load the extension (check [link](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/) for more details)
+
 ## Models and Browser Compatibility
 
-| Task | Model | Firefox | Chrome |
+| Task | Model | Firefox Nightly | Chrome |
 |------|-------|---------|--------|
 | Text Classification | Xenova/distilbert-base-uncased-finetuned-sst-2-english | ✅ | ❌ |
 | Token Classification | Xenova/bert-base-multilingual-cased-ner-hrl | ❌ | ❌ |
@@ -34,3 +42,13 @@ Firefox trail ml require extension running in singleton mode, Run different task
 
 - [huggingface pipelines](https://huggingface.co/docs/transformers.js/api/pipelines#module_pipelines.TranslationPipeline)
 - [firefox ml apis](https://firefox-source-docs.mozilla.org/toolkit/components/ml/extensions.html#webextensions-ai-api)
+
+## development
+
+### for firefox nightly
+
+```bash
+pnpm install
+IS_FIREFOX_WEBEXT=1 pnpm run build
+pnpm run start:firefox-nightly
+```

@@ -32,6 +32,30 @@ export const Options = () => {
             </code>
             allows you to right-click on a page to generate a page summary, or select text to generate a text summary.
           </li>
+          <li>
+            <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+              translation
+            </code>
+            allows you to right-click on selected text to translate it.
+          </li>
+          <li>
+            <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+              text-classification
+            </code>
+            allows you to right-click on selected text to classify it.
+          </li>
+          <li>
+            <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+              text-generation
+            </code>
+            allows you to right-click on selected text to generate a text.
+          </li>
+          <li>
+            <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+              image-classification
+            </code>
+            allows you to right-click on images to classify them.
+          </li>
         </ul>
         <p className="leading-7 [&:not(:first-child)]:mt-6">
           This extension requires the use of Firefox ML engine.

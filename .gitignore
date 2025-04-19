@@ -146,3 +146,12 @@ Network Trash Folder
 Temporary Items
 .apdisk
 extension
+
+firefox.zip
+chrome.zip
+extension.zip
+extension.crx
+extension.xpi
+key.pem
+firefox/
+chrome/
