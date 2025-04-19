@@ -5,6 +5,8 @@ One-click experience of browser's built-in AI features
 > [!WARNING]  
 Firefox trail ml require extension running in singleton mode, Run different task on same page should reload extension first!(reload page is not working)
 
+![screenshot](./screenshots/thebrowserruntimeai.mp4)
+
 ## Usage
 
 ### Firefox
